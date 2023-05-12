@@ -13,6 +13,7 @@ import './persistence/mongo/mongoConfig.js';
 import passport from 'passport';
 import './passport/passportStrategies.js';
 import config from './config.js';
+import { errorMiddleware } from './utils/middlewares/errors.middleware.js';
 
 const app = express();
 
@@ -42,6 +43,8 @@ app.use('/api/carts', CartsRouter.getRouter());
 app.use('/api/products', ProductsRouter.getRouter());
 app.use('/api/users', UsersRouter.getRouter());
 app.use('/views', ViewsRouter.getRouter());
+
+app.use(errorMiddleware);
 
 const httpServer = app.listen(config.PORT, () => {
     console.log(`Servidor escuchando al puerto ${config.PORT}.`)

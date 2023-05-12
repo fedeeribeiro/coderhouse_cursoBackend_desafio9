@@ -1,13 +1,27 @@
 import { faker } from '@faker-js/faker';
 import { productsModel } from '../../mongo/models/products.model.js';
+import CustomError from '../../../utils/errors/CustomError.js';
+import {
+    ErrorsName,
+    ErrorsCause,
+    ErrorsMessage
+} from '../../../utils/errors/errors.js';
 
 export default class ProductsMongo {
     async addProduct(product) {
         try {
+            if (!product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock || !product.category || !product.status) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_INCOMPLETE,
+                    cause: ErrorsCause.PRODUCT_DATA_INCOMPLETE,
+                    message: ErrorsMessage.PRODUCT_DATA_INCOMPLETE,
+                });
+                return null;
+            }
             const newProduct = await productsModel.create(product);
-            return newProduct
+            return newProduct;
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
@@ -45,9 +59,9 @@ export default class ProductsMongo {
                 prevLink: prevLink,
                 nextLink: nextLink,
             }
-            return results
+            return results;
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
@@ -63,26 +77,67 @@ export default class ProductsMongo {
                     code: faker.random.alphaNumeric(6),
                     stock: faker.random.numeric(),
                     category: faker.commerce.department()
-                })
-                mockingProducts.push(product)
+                });
+                mockingProducts.push(product);
             }
-            return mockingProducts
+            return mockingProducts;
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
     async getProductById(id){
         try {
+            if (id.length !== 24) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_INCORRECT_ID,
+                    cause: ErrorsCause.PRODUCT_DATA_INCORRECT_ID,
+                    message: ErrorsMessage.PRODUCT_DATA_INCORRECT_ID
+                });
+                return null;
+            }
             const product = productsModel.findById(id);
-            return product
+            if (!product) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_NOT_FOUND_IN_DATABASE,
+                    cause: ErrorsCause.PRODUCT_DATA_NOT_FOUND_IN_DATABASE,
+                    message: ErrorsMessage.PRODUCT_DATA_NOT_FOUND_IN_DATABASE
+                });
+                return null;
+            }
+            return product;
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
     async updateProduct(id, newProduct){
         try {
+            if (id.length !== 24) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_INCORRECT_ID,
+                    cause: ErrorsCause.PRODUCT_DATA_INCORRECT_ID,
+                    message: ErrorsMessage.PRODUCT_DATA_INCORRECT_ID
+                });
+                return null;
+            }
+            const product = await productsModel.findById(id);
+            if (!product) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_NOT_FOUND_IN_DATABASE,
+                    cause: ErrorsCause.PRODUCT_DATA_NOT_FOUND_IN_DATABASE,
+                    message: ErrorsMessage.PRODUCT_DATA_NOT_FOUND_IN_DATABASE
+                });
+                return null;
+            }
+            if (!newProduct.title || !newProduct.description || !newProduct.price || !newProduct.thumbnail || !newProduct.code || !newProduct.stock || !newProduct.category) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_INCOMPLETE,
+                    cause: ErrorsCause.PRODUCT_DATA_INCOMPLETE,
+                    message: ErrorsMessage.PRODUCT_DATA_INCOMPLETE,
+                });
+                return null;
+            }
             const updatedProduct = await productsModel.findByIdAndUpdate(id, {
                 title: newProduct.title,
                 description: newProduct.description,
@@ -93,18 +148,34 @@ export default class ProductsMongo {
                 category: newProduct.category
             }, { new: true });
             updatedProduct.save();
-            return updatedProduct
+            return updatedProduct;
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
     async deleteProduct(id){
         try {
+            if (id.length !== 24) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_INCORRECT_ID,
+                    cause: ErrorsCause.PRODUCT_DATA_INCORRECT_ID,
+                    message: ErrorsMessage.PRODUCT_DATA_INCORRECT_ID
+                });
+                return null;
+            }
             const deletedProduct = await productsModel.findByIdAndDelete(id);
-            return deletedProduct
+            if (!deletedProduct) {
+                CustomError.createCustomError({
+                    name: ErrorsName.PRODUCT_DATA_NOT_FOUND_IN_DATABASE,
+                    cause: ErrorsCause.PRODUCT_DATA_NOT_FOUND_IN_DATABASE,
+                    message: ErrorsMessage.PRODUCT_DATA_NOT_FOUND_IN_DATABASE
+                });
+                return null;
+            }
+            return deletedProduct;
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 }
