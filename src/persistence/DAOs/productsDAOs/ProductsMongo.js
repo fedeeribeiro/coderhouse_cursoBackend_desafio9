@@ -5,7 +5,7 @@ import {
     ErrorsName,
     ErrorsCause,
     ErrorsMessage
-} from '../../../utils/errors/errors.js';
+} from '../../../utils/errors/errors.enum.js';
 
 export default class ProductsMongo {
     async addProduct(product) {

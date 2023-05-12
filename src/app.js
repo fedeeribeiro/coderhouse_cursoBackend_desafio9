@@ -9,11 +9,12 @@ import CartsRouter from './routes/carts.router.js';
 import ProductsRouter from './routes/products.router.js';
 import ViewsRouter from './routes/views.router.js';
 import UsersRouter from './routes/users.router.js';
+import LoggerTestRouter from './routes/loggerTest.router.js';
 import './persistence/mongo/mongoConfig.js';
 import passport from 'passport';
 import './passport/passportStrategies.js';
 import config from './config.js';
-import { errorMiddleware } from './utils/middlewares/errors.middleware.js';
+import { errorMiddleware } from './middlewares/errors.middleware.js';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/carts', CartsRouter.getRouter());
 app.use('/api/products', ProductsRouter.getRouter());
 app.use('/api/users', UsersRouter.getRouter());
 app.use('/views', ViewsRouter.getRouter());
+app.use('/api/loggerTest', LoggerTestRouter.getRouter());
 
 app.use(errorMiddleware);
 
